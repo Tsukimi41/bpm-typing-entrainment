@@ -1,5 +1,11 @@
 # Source notes and temporary spec attachments
 typing.md
+# 全てのMarkdownファイルを無視する
+*.md
+# ただし、README.md は無視せず追跡する（例外設定）
+!README.md
+
+
 
 # Dependencies and build output
 node_modules/
