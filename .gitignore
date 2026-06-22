@@ -1,0 +1,74 @@
+# Source notes and temporary spec attachments
+typing.md
+
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+.vite/
+
+# TypeScript / package manager caches
+*.tsbuildinfo
+.turbo/
+.eslintcache
+
+# Logs and runtime artifacts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment and local overrides
+.env
+.env.*
+*.env
+*.local
+*.secret
+*.secrets
+
+# Keys, certificates, and other sensitive material
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.jks
+*.der
+*.csr
+*.p7b
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+.history/
+
+# General caches and temp files
+.cache/
+.tmp/
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# Database and local data files that may contain captured test data
+*.db
+*.sqlite
+*.sqlite3
+*.csv
+*.jsonl
+
+# Diagnostic dumps
+*.dump
+*.dmp
+*.core
+
