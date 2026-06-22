@@ -24,8 +24,39 @@ pnpm-debug.log*
 .env.*
 *.env
 *.local
+*.env.local
+*.env.development
+*.env.production
+*.env.test
 *.secret
 *.secrets
+.envrc
+.npmrc
+.yarnrc
+.yarnrc.yml
+.pnpmfile.cjs
+
+# Cloud and hosting tooling state
+.vercel/
+.vercel.*
+.netlify/
+.firebase/
+.now/
+.serverless/
+
+# Package manager state and caches
+.npm/
+.pnpm-store/
+.yarn/
+**/.pnp.*
+**/.yarn-integrity
+
+# Framework build caches that commonly leak local state
+.next/
+.nuxt/
+.svelte-kit/
+storybook-static/
+.parcel-cache/
 
 # Keys, certificates, and other sensitive material
 *.pem
@@ -64,6 +95,9 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.db-journal
 *.csv
 *.jsonl
 
