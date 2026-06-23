@@ -1,3 +1,5 @@
+import rawTextPool from './texts.json';
+
 type BuildOptions = {
   focus: string;
   cadence: string;
@@ -9,6 +11,8 @@ type BuildOptions = {
 export type TrialText = {
   id: number;
   text: string;
+  source: 'generated' | 'json';
+  sourceId: number;
 };
 
 const FOCUS_WORDS = [
@@ -53,7 +57,7 @@ function normalizeLength(text: string, targetLength = 200): string {
   return result;
 }
 
-export function createTrialTextPool(): TrialText[] {
+function createGeneratedTrialTextPool(): TrialText[] {
   const pool: TrialText[] = [];
   for (let index = 1; index <= 100; index += 1) {
     const options: BuildOptions = {
@@ -66,7 +70,20 @@ export function createTrialTextPool(): TrialText[] {
 
     const suffix = ` Trial ${index}: code ${1000 + index}, ratios ${index % 9}, ${index % 7}, and notes (${index % 5}) are embedded for consistency.`;
     const text = normalizeLength(buildParagraph(options) + suffix, 200);
-    pool.push({ id: index, text });
+    pool.push({ id: index, text, source: 'generated', sourceId: index });
   }
   return pool;
+}
+
+function createJsonTrialTextPool(): TrialText[] {
+  return rawTextPool.map((item) => ({
+    id: 100 + item.id,
+    text: item.text,
+    source: 'json' as const,
+    sourceId: item.id,
+  }));
+}
+
+export function createTrialTextPool(): TrialText[] {
+  return [...createGeneratedTrialTextPool(), ...createJsonTrialTextPool()];
 }
