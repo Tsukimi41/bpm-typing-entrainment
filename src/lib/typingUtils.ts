@@ -28,7 +28,7 @@ export function isBlockedDevice(): boolean {
   return mobileUa || narrowScreen;
 }
 
-export function isControlKey(key: string): boolean {
+export function isNonTypingKey(key: string): boolean {
   return [
     'Backspace',
     'Delete',
@@ -39,10 +39,28 @@ export function isControlKey(key: string): boolean {
     'Tab',
     'Enter',
     'Escape',
+    'Shift',
     'Meta',
     'Alt',
+    'AltGraph',
     'Control',
-  ].includes(key);
+    'CapsLock',
+    'NumLock',
+    'ScrollLock',
+    'Fn',
+    'FnLock',
+    'ContextMenu',
+    'Insert',
+    'Home',
+    'End',
+    'PageUp',
+    'PageDown',
+    'Pause',
+    'PrintScreen',
+    'Dead',
+    'Process',
+    'Unidentified',
+  ].includes(key) || key.length !== 1;
 }
 
 export function buildCsv(records: RecordRow[]): string {

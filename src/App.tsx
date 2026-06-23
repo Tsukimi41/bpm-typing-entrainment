@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createTrialTextPool, type TrialText } from './data/trialTexts';
 import type { BpmCondition, RecordRow } from './types';
-import { buildCsv, clampHistory, formatTimestamp, isBlockedDevice, isControlKey } from './lib/typingUtils';
+import { buildCsv, clampHistory, formatTimestamp, isBlockedDevice, isNonTypingKey } from './lib/typingUtils';
 
 const BPM_OPTIONS: BpmCondition[] = ['Silence', '60 BPM', '140 BPM'];
 const RECENT_HISTORY_LIMIT = 5;
@@ -49,7 +49,7 @@ export default function App() {
         return;
       }
 
-      if (isControlKey(event.key)) {
+      if (event.repeat || event.isComposing || isNonTypingKey(event.key)) {
         event.preventDefault();
         return;
       }
