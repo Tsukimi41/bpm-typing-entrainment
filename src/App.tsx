@@ -217,7 +217,7 @@ export default function App() {
               <th>timestamp</th>
               <th>subject</th>
               <th>bpm</th>
-              <th>text</th>
+              <th>text_id</th>
               <th>cpm</th>
               <th>error%</th>
               <th>seconds</th>
