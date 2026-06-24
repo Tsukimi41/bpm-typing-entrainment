@@ -5,12 +5,16 @@ import { buildCsv, clampHistory, formatTimestamp, isBlockedDevice, isNonTypingKe
 
 const BPM_OPTIONS: BpmCondition[] = ['Silence', '60 BPM', '140 BPM'];
 const RECENT_HISTORY_LIMIT = 5;
+const JSON_TEXT_PICK_PROBABILITY = 0.85;
 
 function pickTrialText(pool: TrialText[], history: number[]): TrialText {
   const recent = new Set(history.slice(-RECENT_HISTORY_LIMIT));
   const candidates = pool.filter((item) => !recent.has(item.id));
   const source = candidates.length > 0 ? candidates : pool;
-  return source[Math.floor(Math.random() * source.length)];
+  const preferredSource = Math.random() < JSON_TEXT_PICK_PROBABILITY ? 'json' : 'generated';
+  const preferredCandidates = source.filter((item) => item.source === preferredSource);
+  const weightedSource = preferredCandidates.length > 0 ? preferredCandidates : source;
+  return weightedSource[Math.floor(Math.random() * weightedSource.length)];
 }
 
 function formatElapsed(seconds: number): string {
