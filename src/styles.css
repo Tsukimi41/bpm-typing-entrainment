@@ -111,6 +111,27 @@ select {
   color: #404040;
 }
 
+.shortcut-help {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  justify-content: center;
+  color: #505050;
+  font-size: 0.85rem;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  border: 1px solid #b8b8b8;
+  border-bottom-width: 2px;
+  background: #fff;
+  color: #101010;
+  padding: 0.08rem 0.32rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
 .shaking {
   animation: shake 0.16s linear 0s 2;
 }

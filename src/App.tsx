@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createTrialTextPool, type TrialText } from './data/trialTexts';
 import type { BpmCondition, RecordRow } from './types';
 import { buildCsv, clampHistory, formatTimestamp, isBlockedDevice, isNonTypingKey } from './lib/typingUtils';
@@ -37,6 +37,7 @@ export default function App() {
   const endedAtRef = useRef<number | null>(null);
   const progressRef = useRef(0);
   const mistakesRef = useRef(0);
+  const subjectInputRef = useRef<HTMLInputElement | null>(null);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function App() {
         return;
       }
 
-      if (event.repeat || event.isComposing || isNonTypingKey(event.key)) {
+      if (event.repeat || event.isComposing || event.ctrlKey || event.altKey || event.metaKey || isNonTypingKey(event.key)) {
         event.preventDefault();
         return;
       }
@@ -120,7 +121,7 @@ export default function App() {
     };
   }, []);
 
-  const startTrial = () => {
+  const startTrial = useCallback(() => {
     const nextTrial = pickTrialText(trialTextPool, recentTextIds);
     setCurrentTrial(nextTrial);
     setRecentTextIds((previous) => clampHistory([...previous, nextTrial.id], RECENT_HISTORY_LIMIT));
@@ -133,9 +134,14 @@ export default function App() {
     setIsShaking(false);
     setClipboardStatus('');
     setScreen('trial');
-  };
+  }, [recentTextIds, trialTextPool]);
 
-  const copyCsv = async () => {
+  const copyCsv = useCallback(async () => {
+    if (records.length === 0) {
+      setClipboardStatus('コピーできる記録がありません');
+      return;
+    }
+
     const csv = buildCsv(records);
     try {
       await navigator.clipboard.writeText(csv);
@@ -143,7 +149,70 @@ export default function App() {
     } catch {
       setClipboardStatus('クリップボードへのコピーに失敗しました');
     }
-  };
+  }, [records]);
+
+  const cycleBpmCondition = useCallback(() => {
+    setBpmCondition((current) => {
+      const currentIndex = BPM_OPTIONS.indexOf(current);
+      return BPM_OPTIONS[(currentIndex + 1) % BPM_OPTIONS.length];
+    });
+  }, []);
+
+  useEffect(() => {
+    if (screen === 'setup') {
+      subjectInputRef.current?.focus();
+    }
+  }, [screen]);
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if (blocked || event.isComposing || event.repeat) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+      const activeElement = document.activeElement;
+      const isButtonFocused = activeElement instanceof HTMLButtonElement;
+      const isSelectFocused = activeElement instanceof HTMLSelectElement;
+
+      if (event.ctrlKey && event.shiftKey && key === 'c') {
+        event.preventDefault();
+        void copyCsv();
+        return;
+      }
+
+      if (screen === 'trial') {
+        return;
+      }
+
+      if (event.altKey && key === 'b') {
+        event.preventDefault();
+        cycleBpmCondition();
+        return;
+      }
+
+      if (key === 'enter' && !event.ctrlKey && !event.altKey && !event.metaKey && !event.shiftKey) {
+        if (screen === 'setup' && !isButtonFocused && !isSelectFocused) {
+          event.preventDefault();
+          startTrial();
+          return;
+        }
+
+        if (screen === 'finished' && !isButtonFocused) {
+          event.preventDefault();
+          startTrial();
+        }
+      }
+
+      if (screen === 'finished' && (key === 'escape' || key === 'backspace')) {
+        event.preventDefault();
+        setScreen('setup');
+      }
+    };
+
+    window.addEventListener('keydown', handleShortcut, { passive: false });
+    return () => window.removeEventListener('keydown', handleShortcut);
+  }, [blocked, copyCsv, cycleBpmCondition, screen, startTrial]);
 
   if (blocked) {
     return (
@@ -168,6 +237,7 @@ export default function App() {
             <label htmlFor="subjectId">被験者ID</label>
             <input
               id="subjectId"
+              ref={subjectInputRef}
               value={subjectId}
               onChange={(event) => setSubjectId(event.target.value)}
               spellCheck={false}
@@ -209,6 +279,13 @@ export default function App() {
           <button type="button" onClick={() => setScreen('setup')}>設定へ戻る</button>
         </section>
       )}
+
+      <section className="shortcut-help" aria-label="キーボード操作">
+        <span><kbd>Enter</kbd> 開始/次試行</span>
+        <span><kbd>Alt</kbd>+<kbd>B</kbd> BPM切替</span>
+        <span><kbd>Esc</kbd> 設定へ戻る</span>
+        <span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> CSVコピー</span>
+      </section>
 
       <section className="records-panel">
         <div className="records-header">
